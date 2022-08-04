@@ -27,6 +27,6 @@ defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'qbehaviour_interactivemoopt';
 $plugin->release   = '0.1.1';
-$plugin->version   = 2022080500;
+$plugin->version   = 2022080501;
 $plugin->requires  = 2021051100;
 $plugin->maturity  = MATURITY_ALPHA;

@@ -15,9 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Question behaviour type for interactive behaviour.
+ * Question behaviour type for interactive behaviour for MooPT quesitons.
  *
- * @package    qbehaviour_interactive
+ * @package    qbehaviour_interactivemoopt
  * @copyright  2012 The Open University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -27,14 +27,14 @@ defined('MOODLE_INTERNAL') || die();
 
 
 /**
- * Question behaviour type information for interactive behaviour.
+ * Question behaviour type information for interactive behaviour for MooPT questions.
  *
  * @copyright  2012 The Open University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class qbehaviour_interactive_type extends question_behaviour_type {
+class qbehaviour_interactivemoopt_type extends question_behaviour_type {
     public function is_archetypal() {
-        return true;
+        return false;
     }
 
     public function allows_multiple_submitted_responses() {
