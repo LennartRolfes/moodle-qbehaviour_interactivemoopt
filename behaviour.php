@@ -280,6 +280,30 @@ class qbehaviour_interactivemoopt extends question_behaviour_with_multiple_tries
             return question_attempt::DISCARD;
         }
 
+        $laststep = $this->qa->get_last_step();
+        if($laststep->has_behaviour_var('gradingresult') && $laststep->has_behaviour_var('triesleft')){
+            // The last step was already graded partially correct or wrong and there are tries left, but the student decides to finish instead of trying again.
+            // We just want to reuse the last grading result instead of grading the same answer again.
+
+            // get last grading result and calculate fraction
+            if ($laststep->has_qt_var('score')) {
+                $score = $laststep->get_qt_var('score');
+                $maxmark = $this->qa->get_max_mark();
+                if ($maxmark == 0) {
+                    $fraction = 0;
+                } else {
+                    $fraction = $score / $maxmark;
+                }
+            } else {
+                $fraction = 0;
+            }
+
+            // set adjusted fraction and a finished state
+            $pendingstep->set_state(question_state::graded_state_for_fraction($fraction));
+            $pendingstep->set_fraction($this->adjust_fraction($fraction, $pendingstep));
+            return question_attempt::KEEP;
+        }
+
         $response = $this->qa->get_last_qt_data();
         if (!$this->question->is_gradable_response($response)) {
             $pendingstep->set_state(question_state::$gaveup);
@@ -322,10 +346,6 @@ class qbehaviour_interactivemoopt extends question_behaviour_with_multiple_tries
             $state = $this->question->grade_response_asynch($this->qa, $responsefiles ?? [], $freetextanswers ?? []);
             $pendingstep->set_state($state);
             $pendingstep->set_fraction($this->get_min_fraction());
-
-//            list($fraction, $state) = $this->question->grade_response($response);
-//            $pendingstep->set_fraction($this->adjust_fraction($fraction, $pendingstep));
-//            $pendingstep->set_state($state);
         }
         $pendingstep->set_new_response_summary($this->question->summarise_response($response));
         return question_attempt::KEEP;
