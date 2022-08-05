@@ -281,7 +281,7 @@ class qbehaviour_interactivemoopt extends question_behaviour_with_multiple_tries
         }
 
         $laststep = $this->qa->get_last_step();
-        if($laststep->has_behaviour_var('gradingresult') && $laststep->has_behaviour_var('triesleft')){
+        if($laststep->has_behaviour_var('gradingresult') && $laststep->has_behaviour_var('_triesleft')){
             // The last step was already graded partially correct or wrong and there are tries left, but the student decides to finish instead of trying again.
             // We just want to reuse the last grading result instead of grading the same answer again.
 
