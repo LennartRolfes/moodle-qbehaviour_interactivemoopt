@@ -155,9 +155,9 @@ class qbehaviour_interactivemoopt extends question_behaviour_with_multiple_tries
         $step->set_behaviour_var('_triesleft', count($this->question->hints) + 1);
     }
 
-    protected function adjust_fraction($fraction, question_attempt_pending_step $pendingstep) {
+    protected function adjust_fraction($fraction, $triesleft = null) {
         $totaltries = $this->qa->get_step(0)->get_behaviour_var('_triesleft');
-        $triesleft = $this->qa->get_last_behaviour_var('_triesleft');
+        $triesleft = $triesleft ?? $this->qa->get_last_behaviour_var('_triesleft');
 
         $fraction -= ($totaltries - $triesleft) * $this->question->penalty;
         $fraction = max($fraction, 0);
@@ -285,6 +285,8 @@ class qbehaviour_interactivemoopt extends question_behaviour_with_multiple_tries
             // The last step was already graded partially correct or wrong and there are tries left, but the student decides to finish instead of trying again.
             // We just want to reuse the last grading result instead of grading the same answer again.
 
+            $triesleft = $laststep->get_behaviour_var('_triesleft');
+
             // get last grading result and calculate fraction
             if ($laststep->has_qt_var('score')) {
                 $score = $laststep->get_qt_var('score');
@@ -299,8 +301,9 @@ class qbehaviour_interactivemoopt extends question_behaviour_with_multiple_tries
             }
 
             // set adjusted fraction and a finished state
+            // triesleft + 1 because its not a new try, since we just reuse the old grading result
             $pendingstep->set_state(question_state::graded_state_for_fraction($fraction));
-            $pendingstep->set_fraction($this->adjust_fraction($fraction, $pendingstep));
+            $pendingstep->set_fraction($this->adjust_fraction($fraction, $triesleft + 1));
             return question_attempt::KEEP;
         }
 
@@ -382,14 +385,14 @@ class qbehaviour_interactivemoopt extends question_behaviour_with_multiple_tries
         if ($laststep->has_behaviour_var('submit')) {
             if ($state == question_state::$gradedright || $triesleft == 1) {
                 $pendingstep->set_state($state);
-                $pendingstep->set_fraction($this->adjust_fraction($fraction, $pendingstep));
+                $pendingstep->set_fraction($this->adjust_fraction($fraction));
             } else {
                 $pendingstep->set_behaviour_var('_triesleft', $triesleft - 1);
                 $pendingstep->set_state(question_state::$todo);
             }
         } else {
             $pendingstep->set_state($state);
-            $pendingstep->set_fraction($this->adjust_fraction($fraction, $pendingstep));
+            $pendingstep->set_fraction($this->adjust_fraction($fraction));
         }
 
         $pendingstep->set_new_response_summary($this->question->summarise_response($pendingstep->get_all_data()));
@@ -399,7 +402,7 @@ class qbehaviour_interactivemoopt extends question_behaviour_with_multiple_tries
         $regraderecord = $DB->get_record('quiz_overview_regrades',
             ['questionusageid' => $this->qa->get_usage_id(), 'slot' => $this->qa->get_slot()]);
         if ($regraderecord) {
-            $regraderecord->newfraction = $this->adjust_fraction($fraction, $pendingstep);
+            $regraderecord->newfraction = $this->adjust_fraction($fraction);
             $DB->update_record('quiz_overview_regrades', $regraderecord);
         }
 
