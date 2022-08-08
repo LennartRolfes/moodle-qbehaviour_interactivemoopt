@@ -23,6 +23,15 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+// MooPT
+$string['finished'] = 'Finished: {$a}';
+$string['graded'] = 'Graded: {$a}';
+$string['graderunavailable'] = 'Automatic grading failed';
+$string['grading'] = 'Grading: {$a}';
+$string['gradingsummary'] = 'The submission has been sent to the grader for grading.';
+$string['gradedsummary'] = 'The submission has been graded by the grader';
+
+// Behaviour
 $string['pluginname'] = 'Interactive with multiple tries for Moodle Programmin Task (MooPT)';
 $string['privacy:metadata'] = 'The MooPT interactive with multiple tries question behaviour plugin does not store any personal data.';
 $string['triesremaining'] = 'Tries remaining: {$a}';
