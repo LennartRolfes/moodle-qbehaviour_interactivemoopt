@@ -30,6 +30,7 @@ $string['graderunavailable'] = 'Automatic grading failed';
 $string['grading'] = 'Grading: {$a}';
 $string['gradingsummary'] = 'The submission has been sent to the grader for grading.';
 $string['gradedsummary'] = 'The submission has been graded by the grader';
+$string['alreadygradedsummary'] = 'The submission has already been graded. The last score was reused and the question attempt was finished.';
 
 // Behaviour
 $string['pluginname'] = 'Interactive with multiple tries for Moodle Programmin Task (MooPT)';

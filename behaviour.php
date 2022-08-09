@@ -193,8 +193,13 @@ class qbehaviour_interactivemoopt extends question_behaviour_with_multiple_tries
         if ($step->has_behaviour_var('comment')) {
             return $this->summarise_manual_comment($step);
         } else if ($step->has_behaviour_var('finish')) {
-            return get_string('finished', 'qbehaviour_interactivemoopt',
-                get_string('gradingsummary', 'qbehaviour_interactivemoopt'));
+            if ($step->get_state()->is_graded()) {
+                return get_string('finished', 'qbehaviour_interactivemoopt',
+                    get_string('alreadygradedsummary', 'qbehaviour_interactivemoopt'));
+            } else {
+                return get_string('finished', 'qbehaviour_interactivemoopt',
+                    get_string('gradingsummary', 'qbehaviour_interactivemoopt'));
+            }
         } else if ($step->has_behaviour_var('tryagain')) {
             return get_string('tryagain', 'qbehaviour_interactivemoopt');
         } else if ($step->has_behaviour_var('submit')) {
