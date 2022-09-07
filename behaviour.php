@@ -281,16 +281,24 @@ class qbehaviour_interactivemoopt extends question_behaviour_with_multiple_tries
     public function process_finish(question_attempt_pending_step $pendingstep) {
         global $DB;
 
+        $laststep = $this->qa->get_last_step();
+        if($laststep->has_behaviour_var('submit')){
+            // Case 1: last answer has been submitted but the grading hasn't finished yet
+            // (pressing finish while waiting for the gradingresult).
+            $pendingstep->set_state(question_state::$finished);
+            $pendingstep->set_fraction(0);
+            return question_attempt::KEEP;
+        }
+
         if ($this->qa->get_state()->is_finished()) {
             return question_attempt::DISCARD;
         }
 
-        $laststep = $this->qa->get_last_step();
         if($laststep->has_behaviour_var('gradingresult') && $laststep->has_behaviour_var('_triesleft')){
-            // The last step was already graded partially correct or wrong and there are tries left, but the student decides to finish instead of trying again.
+            // Case 2: the last step has already been graded partially correct or wrong and there are tries left,
+            // but the student decides to finish instead of trying again
+            // (pressing finish in try again state).
             // We just want to reuse the last grading result instead of grading the same answer again.
-
-            $triesleft = $laststep->get_behaviour_var('_triesleft');
 
             // get last grading result and calculate fraction
             if ($laststep->has_qt_var('score')) {
@@ -305,6 +313,8 @@ class qbehaviour_interactivemoopt extends question_behaviour_with_multiple_tries
                 $fraction = 0;
             }
 
+            $triesleft = $laststep->get_behaviour_var('_triesleft');
+
             // set adjusted fraction and a finished state
             // triesleft + 1 because its not a new try, since we just reuse the old grading result
             $pendingstep->set_state(question_state::graded_state_for_fraction($fraction));
@@ -314,9 +324,11 @@ class qbehaviour_interactivemoopt extends question_behaviour_with_multiple_tries
 
         $response = $this->qa->get_last_qt_data();
         if (!$this->question->is_gradable_response($response)) {
+            // Case 3: last answer hasn't been submitted yet, but is not gradable.
             $pendingstep->set_state(question_state::$gaveup);
-//            $pendingstep->set_fraction($this->get_min_fraction());
+            $pendingstep->set_fraction(0);
         } else {
+            // Case 4: last answer hasn't been submitted yet and needs to be sent to the grader
 
             if ($this->question->enablefilesubmissions) {
                 // We are in a regrade.
@@ -353,7 +365,6 @@ class qbehaviour_interactivemoopt extends question_behaviour_with_multiple_tries
 
             $state = $this->question->grade_response_asynch($this->qa, $responsefiles ?? [], $freetextanswers ?? []);
             $pendingstep->set_state($state);
-            $pendingstep->set_fraction($this->get_min_fraction());
         }
         $pendingstep->set_new_response_summary($this->question->summarise_response($response));
         return question_attempt::KEEP;
@@ -385,8 +396,8 @@ class qbehaviour_interactivemoopt extends question_behaviour_with_multiple_tries
         $laststep = $this->qa->get_last_step();
         $state = question_state::graded_state_for_fraction($fraction);
 
-        // We need to know if submit or finish initiated this grading. In a submit grading a wrong answer with tries
-        // remaining is improvable. For this reason the step have to be in state todo
+        // We need to know if submit or finish initiated this gradingresult. A wrong answer during a submit is improvable
+        // when there are tries left. For this reason the step have to be in state todo.
         if ($laststep->has_behaviour_var('submit')) {
             if ($state == question_state::$gradedright || $triesleft == 1) {
                 $pendingstep->set_state($state);

@@ -38,8 +38,6 @@ class qbehaviour_interactivemoopt_renderer extends qbehaviour_renderer {
     public function controls(question_attempt $qa, question_display_options $options) {
         if ($options->readonly === qbehaviour_interactivemoopt::TRY_AGAIN_VISIBLE ||
                 $options->readonly === qbehaviour_interactivemoopt::TRY_AGAIN_VISIBLE_READONLY) {
-            //TODO: disable submit button while grading
-
             // We are in the try again state, so no submit button.
             return '';
         }
@@ -53,7 +51,6 @@ class qbehaviour_interactivemoopt_renderer extends qbehaviour_renderer {
                         $options->readonly !== qbehaviour_interactivemoopt::TRY_AGAIN_VISIBLE_READONLY)) {
             return '';
         }
-        //TODO: check if the above part works correctly
 
         $attributes = array(
             'type' => 'submit',
