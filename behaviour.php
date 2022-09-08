@@ -71,7 +71,6 @@ class qbehaviour_interactivemoopt extends question_behaviour_with_multiple_tries
      * @return bool are we are currently in the try_again state.
      */
     public function is_try_again_state() {
-
         $laststep = $this->qa->get_last_step();
         // try again state: last step was graded wrong with a submit and tries left
         // laststep gradingresult && tries left: last step graded wrong with a submit and tries left (see process_gradingresult())
@@ -405,6 +404,7 @@ class qbehaviour_interactivemoopt extends question_behaviour_with_multiple_tries
             } else {
                 $pendingstep->set_behaviour_var('_triesleft', $triesleft - 1);
                 $pendingstep->set_state(question_state::$todo);
+                $pendingstep->set_behaviour_var('_showGradedFeedback', 1);
             }
         } else {
             $pendingstep->set_state($state);
@@ -423,7 +423,6 @@ class qbehaviour_interactivemoopt extends question_behaviour_with_multiple_tries
         }
 
         return question_attempt::KEEP;
-
     }
 
     public function process_graderunavailable(question_attempt_pending_step $pendingstep){
