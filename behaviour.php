@@ -330,7 +330,6 @@ class qbehaviour_interactivemoopt extends question_behaviour_with_multiple_tries
             // Case 4: last answer hasn't been submitted yet and needs to be sent to the grader
 
             if ($this->question->enablefilesubmissions) {
-                // We are in a regrade.
                 $record = $DB->get_record('question_usages', array('id' => $this->qa->get_usage_id()), 'contextid');
                 $qubacontextid = $record->contextid;
                 $responsefiles = $this->qa->get_last_qt_files('answer', $qubacontextid);
